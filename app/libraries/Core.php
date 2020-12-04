@@ -1,20 +1,31 @@
 <?php
 class Core {
-    protected $currentController = 'Page';
+    protected $currentController = 'Pages';
     protected $currentMethod = 'index';
     protected $params = [];
 
     public function __construct(){
         $url = $this->getURL();
-
-        //look in 'controllers' folder for first value, ucwords will
-        //capitilize the first letter
+        //check if the first item in url array exists in 'controllers' folder
         if( file_exists('../app/controllers/'.ucwords($url[0]).'.php')  ){
+            echo 'yooo';
             $this->currentController = ucwords($url[0]);
             unset($url[0]);
         }
-            require('../app/controllers/' . $this->currentController . '.php');
-           // $this->currentController = new $this->currentController;
+        require_once('../app/controllers/' . $this->currentController . '.php');
+        $this->currentController = new $this->currentController;
+        
+        //check for the second item in url array
+        if(isset($url[1])){
+            $this->currentMethod = $url[1];
+            unset($url[1]);
+        }
+        //params array is basically everything in $url except the first(controller) and second(method) item
+        $this->params = $url ? array_values($url) : [];
+        //this will call the respective class in 'controllers' 
+        call_user_func_array([$this->currentController, $this->currentMethod], $this->params);
+
+        
     }
 
     //returns an array containing all the parameters in url

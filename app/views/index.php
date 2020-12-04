@@ -1,0 +1,1 @@
+hello from views/index.php
